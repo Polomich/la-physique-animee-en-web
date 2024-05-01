@@ -1,0 +1,13 @@
+* {
+    border-color: white;
+    border-style: solid;
+}
+
+body {
+    background-color: pink;
+}
+
+canvas {
+    border-color: green;
+    border-style: dotted;
+}
