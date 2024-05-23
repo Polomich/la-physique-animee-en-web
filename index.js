@@ -1,63 +1,23 @@
-// // You can access a <canvas> element with the HTML DOM method getElementById().
-// const canvas = document.getElementById('canvas');
+//////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
 
-// // To draw in the canvas you need to create a 2D context object:
-// const context = canvas.getContext('2d');
+// variables pour l'équation 
+var g = 9.807; // accélération gravitationnelle
+var x0 = 100; // position x initiale
+var y0 = 100; // position y initiale
+var angle = 45; // angle en degrés
+var vi = 100; // velocité initiale
+var t0; // temps initiale
 
-// //set up the ball
-// var radius = 20;
-// var color = "#33ccff";
+//////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
 
-// //set up physic vars
-// var g = 0.5; // acceleration due to gravity
-// var x = 50; // initial horizontal position
-// var y = 50; // initial vertical position
-// // =0 : bounce in place; >0 : bounce to the right; <0 : bounce left
-// var vx = 0; // initial horizontal speed
-// var vy = 0; // initial vertical speed
-
-// //load ball
-// window.onload = init;
-
-// //on windows creation
-// function init() {
-//     setInterval(onEachStep, 1000 / 60); // 60 fps
-// };
-
-// //
-// function onEachStep() {
-//     vy += g; // gravity increases the vertical speed
-//     x += vx; // horizontal speed increases horizontal position
-//     y += vy; // vertical speed increases vertical position
-//     if (y > canvas.height - radius) { // if ball hits the ground
-//         y = canvas.height - radius; // reposition it at the ground
-//         vy *= -0.8; // then reverse and reduce its vertical speed
-//     }
-//     if (x > canvas.width + radius) { // if ball goes beyond canvas
-//         x = -radius; // wrap it around
-//     }
-//     drawBall(); // draw the ball
-// };
-
-
-// function drawBall() {
-//     with (context) {
-//         clearRect(0, 0, canvas.width, canvas.height);
-//         fillStyle = color;
-//         beginPath();
-//         arc(x, y, radius, 0, 2 * Math.PI, true);
-//         closePath();
-//         fill();
-//     };
-// };
-
-/////////////////////////////////////////////////
 //vector object
 function Vector2D(x, y) {
     this.x = x;
     this.y = y;
 }
-// PUBLIC METHODS
+// METHODES PUBLIQUES
 Vector2D.prototype = {
     lengthSquared: function () {
         return this.x * this.x + this.y * this.y;
@@ -65,57 +25,33 @@ Vector2D.prototype = {
     length: function () {
         return Math.sqrt(this.lengthSquared());
     },
-    // clone: function () {
-    //     return new Vector2D(this.x, this.y);
-    // },
+
     negate: function () {
         this.x = - this.x;
         this.y = - this.y;
     },
-    // normalize: function () {
-    //     var length = this.length();
-    //     if (length > 0) {
-    //         this.x /= length;
-    //         this.y /= length;
-    //     }
-    //     return this.length();
-    // },
-    // add: function (vec) {
-    //     return new Vector2D(this.x + vec.x, this.y + vec.y);
-    // },
-    // incrementBy: function (vec) {
-    //     this.x += vec.x;
-    //     this.y += vec.y;
-    // },
+
     subtract: function (vec) {
         return new Vector2D(this.x - vec.x, this.y - vec.y);
     },
-    // decrementBy: function (vec) {
-    //     this.x -= vec.x;
-    //     this.y -= vec.y;
-    // },
-    // multiply: function (k) {
-    //     return new Vector2D(k * this.x, k * this.y);
-    // },
+
     addScaled: function (vec, k) {
         return new Vector2D(this.x + k * vec.x, this.y + k * vec.y);
     },
-    // scaleBy: function (k) {
-    //     this.x *= k;
-    //     this.y *= k;
-    // },
+
     dotProduct: function (vec) {
         return this.x * vec.x + this.y * vec.y;
     }
 };
-// STATIC METHODS
+// METHODES STATIQUES
 Vector2D.distance = function (vec1, vec2) {
     return (vec1.subtract(vec2)).length();
 }
 Vector2D.angleBetween = function (vec1, vec2) {
     return Math.acos(vec1.dotProduct(vec2) / (vec1.length() * vec2.length()));
 }
-////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////
 
 //ball object
 function Ball(radius, color) {
@@ -151,31 +87,21 @@ Ball.prototype = {
     redraw: function (context, radius) {
         context.fillStyle = 'blue';
         context.beginPath();
-        context.arc(this.x, this.y, radius, 0, Math.PI * 2, true);
+        context.arc(this.x, this.y, radius, 0, Math.PI * 2);
         context.closePath();
         context.fill();
     }
 };
+
 //////////////////////////////////////////////////////////
 
-// variables pour l'equation 
-var g = 9.807; // accélération gravitationnelle
-var x0 = 100; // position x initiale
-var y0 = 100; // position y initiale
-var angle = 70; // angle en degrees
-var vi = 90; // vitesse initiale
-var t0; // temps initiale
-
-////////////////////////////////////////////////////////////
-
-/* global vars */
+/* variables globales */
 //variables pour canvas
 var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
 
 //variables pour la balle
 var balle;
-var degrade;
 var rayon = 15;
 var pos0 = new Vector2D(x0, y0 * -1);// position initiale
 
@@ -184,7 +110,7 @@ var animId;
 var dt;// delta temps
 
 // variables de vecteurs
-var radians = angle * Math.PI / 180; // convertire les degrees en radians
+var radians = angle * Math.PI / 180; // convertire les degrés en radians
 var vx = Math.cos(radians) * vi; // velocité horizontale
 var vy = Math.sin(radians) * vi; // velocité verticale
 var velo = new Vector2D(vx, -vy); // vecteur des velocités
@@ -217,14 +143,14 @@ function onTimer() {
     t0 = t1;
     if (dt > 0.2) { dt = 0; }; // correction d'un bug si l'utilisateur change d'onglet
 
-    // tant que la balle ne touche pas a terre
+    // tant que la balle ne touche pas à terre
     if (balle.pos2D.y < (-rayon - 40)) {
         move(); // animer la prochaine seconde de la balle
     }
 }
 
 function move() {
-    // numerical solution - Euler scheme
+    // solution numérique - Schéma d'Euler
     balle.pos2D = balle.pos2D.addScaled(balle.velo2D, dt);
     balle.velo2D = balle.velo2D.addScaled(acc, dt);
 
