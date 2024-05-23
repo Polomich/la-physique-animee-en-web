@@ -42,12 +42,6 @@ h2 {}
     width: fit-content;
 }
 
-#buttons-div {
-    display: flex;
-    justify-content: baseline;
-    align-items: baseline;
-}
-
 button {
     width: 150px;
     height: 50px;
