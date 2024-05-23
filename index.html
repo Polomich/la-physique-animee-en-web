@@ -7,15 +7,40 @@
 </head>
 
 <body>
-    <h1>This is a Heading</h1>
-    <p>This is a paragraph.</p>
-    <button onclick="animFrame()">Lancer</button>
+    <header>
+        <h1>La Physique Animée</h1>
+        <h2>Comment utiliser le prototype</h2>
+        <div id="instructions">
+            <p>1. Dans le document "index.js", trouvez les variables suivantes:</p>
+            <p id="vars">
+                var g = 9.807; // accélération gravitationnelle <br>
+                var x0 = 100; // position x initiale <br>
+                var y0 = 100; // position y initiale <br>
+                var angle = 70; // angle en degrees <br>
+                var vi = 90; // vitesse initiale <br>
+                var t0; // temps initiale
+            </p>
+            <p>
+                2. Modifiez-les! Jouez avec!
+            </p>
+            <p>
+                3. Cliquez sur le bouton "Lancer".
+            </p>
+        </div>
+
+        <div id="buttons-div">
+            <button onclick="animFrame()">Lancer</button>
+        </div>
+
+    </header>
+
     <section id="page">
+        <button id="reload" onclick="location.reload()"><img src="reload-icon.png" alt="reload-icon"></button>
         <div id="canvas-container">
             <canvas id="canvas"></canvas>
         </div>
     </section>
-    <!-- Script has to go after the canvas to work -->
+    <!-- Le script doit aller apres le canvas pour fonctionner -->
     <script src="index.js"></script>
 
 </body>

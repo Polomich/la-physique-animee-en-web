@@ -127,12 +127,6 @@ function Ball(radius, color) {
     this.vy = 0;
 }
 Ball.prototype = {
-    // get x() {
-    //     return this.x;
-    // },
-    // get y() {
-    //     return this.y;
-    // },
     get pos2D() {
         return new Vector2D(this.x, this.y);
     },
@@ -148,64 +142,68 @@ Ball.prototype = {
         this.vy = velo.y;
     },
     draw: function (context) {
-        context.fillStyle = 'red';
+        context.fillStyle = 'blue';
         context.beginPath();
         context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
         context.closePath();
         context.fill();
     },
     redraw: function (context, radius) {
-        context.fillStyle = 'red';
+        context.fillStyle = 'blue';
         context.beginPath();
         context.arc(this.x, this.y, radius, 0, Math.PI * 2, true);
         context.closePath();
         context.fill();
     }
 };
-////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
 
-//equation variables
-var g = 9.807;// accélération gravitationnelle
-var x0 = 100;// position x initiale
-var y0 = 100;// position y initiale
-var angle = 70;// angle
-var vi = 90;// vitesse initiale
-var t = 0;// temps d'animation
-/////////////////
+// variables pour l'equation 
+var g = 9.807; // accélération gravitationnelle
+var x0 = 100; // position x initiale
+var y0 = 100; // position y initiale
+var angle = 70; // angle en degrees
+var vi = 90; // vitesse initiale
+var t0; // temps initiale
 
-//global vars
+////////////////////////////////////////////////////////////
+
+/* global vars */
+//variables pour canvas
 var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
-var ball1;
-var ball2;
-var t0; // temps initiale
-var dt;
-var animId;
-var radius = 10;
 
-var radians = angle * Math.PI / 180;
-var vx = Math.cos(radians) * vi;
-var vy = Math.sin(radians) * vi;
-var velo0 = new Vector2D(vx, -vy);// (force horizontale: vx, force vertical: vy)
-
+//variables pour la balle
+var balle;
+var degrade;
+var rayon = 15;
 var pos0 = new Vector2D(x0, y0 * -1);// position initiale
-var acc = new Vector2D(0, g); // (0, g),  g: acceleration due to gravity
-var animTime = 15;
 
+// variables d'animation
+var animId;
+var dt;// delta temps
+
+// variables de vecteurs
+var radians = angle * Math.PI / 180; // convertire les degrees en radians
+var vx = Math.cos(radians) * vi; // velocité horizontale
+var vy = Math.sin(radians) * vi; // velocité verticale
+var velo = new Vector2D(vx, -vy); // vecteur des velocités
+var acc = new Vector2D(0, g); // vecteur de la force gravitationnelle
+
+// variables window
 window.addEventListener('resize', resizeCanvas);
-
 window.onload = init;
 
 function init() {
     resizeCanvas();
     drawLandingStrip(context, canvas.width);
 
-    ball1 = new Ball(radius, '#0080ff');
-    ball1.pos2D = pos0;
-    ball1.velo2D = velo0;
+    balle = new Ball(rayon, '#0080ff');
+    balle.pos2D = pos0;
+    balle.velo2D = velo;
 
-    ball1.draw(context);
-    t0 = new Date().getTime();
+    balle.draw(context);
+    t0 = new Date().getTime(); // temps maintenant
 }
 
 function animFrame() {
@@ -214,52 +212,52 @@ function animFrame() {
 }
 
 function onTimer() {
-    var t1 = new Date().getTime();
+    var t1 = new Date().getTime(); // temps maintenant (plus tard que le premier)
     dt = 0.01 * (t1 - t0); // vitesse d'animation par seconde
     t0 = t1;
-    if (dt > 0.2) { dt = 0; }; // fix for bug if user switches tabs
-    t += dt;
+    if (dt > 0.2) { dt = 0; }; // correction d'un bug si l'utilisateur change d'onglet
 
-    if (ball1.pos2D.y < (-radius - 30)) {
-        move();
+    // tant que la balle ne touche pas a terre
+    if (balle.pos2D.y < (-rayon - 40)) {
+        move(); // animer la prochaine seconde de la balle
     }
 }
 
 function move() {
     // numerical solution - Euler scheme
-    ball1.pos2D = ball1.pos2D.addScaled(ball1.velo2D, dt);
-    ball1.velo2D = ball1.velo2D.addScaled(acc, dt);
+    balle.pos2D = balle.pos2D.addScaled(balle.velo2D, dt);
+    balle.velo2D = balle.velo2D.addScaled(acc, dt);
 
     resizeCanvas();
 
-    // display
+    // afficher la balle
     context.clearRect(0, 0, canvas.width, canvas.height);
     drawLandingStrip(context, canvas.width);
-    ball1.redraw(context, radius);
+    balle.redraw(context, rayon);
 }
 
 function resizeCanvas() {
-    // Get the device pixel ratio (for high-DPI devices)
+    // le rapport de pixels de l'appareil (pour les appareils à haut DPI (point par pouce))
     var dpr = window.devicePixelRatio || 1;
 
-    // Set the size of the canvas in CSS pixels
+    // la taille du canvas en pixels CSS
     canvas.style.width = (window.innerWidth * 0.75 + 'px');
     canvas.style.height = (window.innerHeight * 0.75 + 'px');
 
-    // Set the size of the canvas in device pixels
+    // la taille du canvas en pixels de l'appareil
     canvas.width = window.innerWidth * dpr;
     canvas.height = window.innerHeight * dpr;
 
-    // Scale the drawing context to ensure correct drawing operations
+    // Mettre à l'échelle le context pour garantir des opérations de dessin correctes
     context.scale(dpr, dpr);
 
-    // Transform the context to have a bottom-left origin
-    context.translate(0, canvas.height / dpr); // Move origin to bottom-left
+    // Transformer le context pour avoir une origine en bas à gauche
+    context.translate(0, canvas.height / dpr);
 }
 
 function drawLandingStrip(context, canvasWidth) {
     const rectHeight = 100;
     context.beginPath();
-    context.fillStyle = 'green';
+    context.fillStyle = '#5cd65c';
     context.fillRect(0, -rectHeight, canvasWidth, rectHeight);
 }
